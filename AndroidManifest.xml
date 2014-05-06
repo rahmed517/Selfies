@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.selfies"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="19" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.example.selfies.Home"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.example.selfies.CaptureSafeImg"
+            android:label="@string/title_activity_capture_safe_img"
+            android:parentActivityName="com.example.selfies.Home" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.selfies.Home" />
+        </activity>
+        <activity
+            android:name="com.example.selfies.CaptureMoleImg"
+            android:label="@string/title_activity_capture_mole_img" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.selfies.CaptureSafeImg" />
+        </activity>
+        <activity
+            android:name="com.example.selfies.ProcessMoleImg"
+            android:label="@string/title_activity_process_mole_img" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.selfies.CaptureMoleImg" />
+        </activity>
+        <activity
+            android:name="com.example.selfies.Results"
+            android:label="@string/title_activity_results" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.selfies.ProcessMoleImg" />
+        </activity>
+    </application>
+
+</manifest>
+
