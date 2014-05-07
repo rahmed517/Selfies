@@ -51,7 +51,7 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 	private static double mMinContourArea = .1;
 	private List<MatOfPoint> mContours = new ArrayList<MatOfPoint>();
 	private Scalar CONTOUR_COLOR = new Scalar(255,0,0, 255);
-
+	public List<Point>border = new ArrayList<Point>();
 
 	private Bitmap bitmap_ref;
 	private Bitmap bitmap_sample;
@@ -75,7 +75,7 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 		imgPreview = (ImageView) findViewById(R.id.imgPreview);
 		imgPreview.setFocusable(true);
 		imgPreview.setOnTouchListener(ProcessMoleImg.this);
-		
+
 		scores[0] = processImg();
 
 	}
@@ -104,41 +104,44 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 		mMinContourArea = area;	
 	}
 
-	//the image with the mole is normalized based on the "safe-skin", which is mole free
+	//the sample image is processed to calc border irregularity
 	private double processImg() {
 
 		try {
 			imgPreview.setVisibility(View.VISIBLE);
 
-			// bimatp factory
+			// bitmap factory
 			BitmapFactory.Options options = new BitmapFactory.Options();
 
 			// downsizing image as it throws OutOfMemory Exception for larger
 			// images
 			options.inSampleSize = 8;
 
-			//			bitmap_ref = BitmapFactory.decodeFile(fileUriSafe.getPath(),
-			//					options);
+			bitmap_ref = BitmapFactory.decodeFile(fileUriSafe.getPath(),
+					options);
 
 			bitmap_sample = BitmapFactory.decodeFile(fileUriMole.getPath(),
 					options);
 
 			//convert from bitmap to Mat
-			//			Mat ref = new Mat(bitmap_ref.getWidth(), bitmap_ref.getHeight(), CvType.CV_8UC4);
-			Mat sample = new Mat(bitmap_sample.getWidth(), bitmap_sample.getHeight(), CvType.CV_8UC4);
-			Mat sample2calcgrad = new Mat(bitmap_sample.getWidth(), bitmap_sample.getHeight(), CvType.CV_8UC4);
+			Mat ref = new Mat(bitmap_ref.getHeight(), bitmap_ref.getWidth(), CvType.CV_8UC4);
+			Mat sample = new Mat(bitmap_sample.getHeight(), bitmap_sample.getWidth(), CvType.CV_8UC4);
+			Mat sample2calcgrad = new Mat(bitmap_sample.getHeight(), bitmap_sample.getWidth(), CvType.CV_8UC4);
 
-			//			Utils.bitmapToMat(bitmap_ref, ref);
+			Utils.bitmapToMat(bitmap_ref, ref);
 			Utils.bitmapToMat(bitmap_sample, sample);
 			Utils.bitmapToMat(bitmap_sample,sample2calcgrad);
 
-			//Using Sobel
+			//normalize image based on reference			
+			//sample = normalizeImg(sample, ref);
+
+			//Using Sobel filter to calculate gradient
 			Mat grad_x = new Mat();
 			Mat grad_y = new Mat();
 			Mat abs_grad_x = new Mat();
 			Mat abs_grad_y = new Mat();
 			Mat gradVals = new Mat();
-			Mat sample_gray = new Mat(bitmap_sample.getWidth(),bitmap_sample.getHeight(),CvType.CV_8UC1);
+			Mat sample_gray = new Mat(bitmap_sample.getHeight(),bitmap_sample.getWidth(),CvType.CV_8UC1);
 			Imgproc.cvtColor(sample2calcgrad, sample_gray, Imgproc.COLOR_BGRA2GRAY);
 			Imgproc.GaussianBlur(sample_gray, sample_gray, new Size(5,5), 0);
 
@@ -152,16 +155,10 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 
 			//combine with grad = sqrt(gx^2 + gy^2)
 			Core.addWeighted(abs_grad_x, .5, abs_grad_y, .5, 0, gradVals);
-//			Imgproc.cvtColor(gradVals, sample, Imgproc.COLOR_GRAY2BGRA, 4);
 
-			//single Gradient Calc - x & y at same time
-			//Imgproc.Sobel(sample_gray, gradVals, CvType.CV_8UC1, 1, 1);
-			//Core.convertScaleAbs(gradVals, gradVals, 10, 0);
-			//Imgproc.cvtColor(gradVals, sample, Imgproc.COLOR_GRAY2BGRA, 4);
 
-			//Using CANNY
-			Imgproc.Canny(sample, mIntermediateMat, 80, 90);
-			Imgproc.cvtColor(mIntermediateMat, sample, Imgproc.COLOR_GRAY2BGRA,4);
+			//Using CANNY to further smooth Gaussian blurred image; extract contours
+			Imgproc.Canny(sample_gray, mIntermediateMat, 80, 90);
 
 			//find contours of filtered image
 			List <MatOfPoint> contours = new ArrayList<MatOfPoint>();
@@ -177,17 +174,17 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 					maxArea = area;
 			}
 
-			// Filter contours by area and resize to fit the original image size
+			// Filter contours by area and only keep those above thresh value
 			mContours.clear();
 			each = contours.iterator();
 			while (each.hasNext()) {
 				MatOfPoint contour = each.next();
 				if (Imgproc.contourArea(contour) > mMinContourArea*maxArea) {
-					//Core.multiply(contour, new Scalar(4,4), contour);
 					mContours.add(contour);
+					border.addAll(contour.toList());
 				}
 			}
-			
+
 			//calc gradient along contour & normalize based on total area
 			double totArea = 0;
 			double contourGradientSum = 0;
@@ -196,89 +193,104 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 				MatOfPoint contour = each.next();
 				totArea += Imgproc.contourArea(contour);
 			}
-			
-			//hack code
-			Scalar totGrad = Core.sumElems(gradVals);
-			double score = totGrad.val[0]/totArea;
+
+			Iterator<Point> each_pt = border.iterator();
+			while(each_pt.hasNext()){
+				Point pt = each_pt.next();
+				int x = (int) pt.x;
+				int y = (int) pt.y;			
+				contourGradientSum += Core.mean(gradVals.submat(y-1, y+1, x-1, x+1)).val[0];
+			}
+
+			double score = contourGradientSum/totArea;
 			Log.v(TAG, "score: " +score);
-			
 			Log.v(TAG, "Contours count: " + mContours.size());
+			Log.v(TAG, "Border size: " + border.size());
 			Imgproc.drawContours(sample, mContours, -1, CONTOUR_COLOR);
 
 			//display image with contours
 			Utils.matToBitmap(sample, bitmap_sample);
 			imgPreview.setImageBitmap(bitmap_sample);
 			imgPreview.setFocusable(true);
-			
+
 			return score;
 
-			//			Log.v(TAG, "bitmap to matrix");
-			//
-			//			//calculate mean and stddev for each color channel for both sample and ref
-			//			//stored in matrix mean and stddev
-			//
-			//			MatOfDouble mean_ref = new MatOfDouble(); 
-			//			MatOfDouble std_ref = new MatOfDouble();
-			//			Core.meanStdDev(ref, mean_ref, std_ref);
-			//			Log.v(TAG, "mean_ref" + mean_ref.toString());
-			//			Log.v(TAG, "std_ref" + std_ref.toString());
-			//
-			//
-			//			MatOfDouble mean_sample = new MatOfDouble();
-			//			MatOfDouble std_sample = new MatOfDouble();
-			//			Core.meanStdDev(sample, mean_sample, std_sample);
-			//			Log.v(TAG, "mean_sample" + mean_sample.toString());
-			//			Log.v(TAG, "std_sample" + std_sample.toString());
-			//
-			//			Scalar mean_ref_s = new Scalar(mean_ref.toArray());
-			//			Scalar std_ref_s = new Scalar(std_ref.toArray());
-			//			Scalar mean_samp = new Scalar (mean_sample.toArray());
-			//			Scalar std_samp = new Scalar(std_sample.toArray());
-			//
-			//			List<Mat> lbgr = new ArrayList <Mat>(4);
-			//			Core.split(sample,lbgr);
-			//			Mat mB_sample = lbgr.get(0);
-			//			Mat mG_sample = lbgr.get(1);
-			//			Mat mR_sample = lbgr.get(2);
-			//			Mat temp = new Mat (bitmap_sample.getWidth(), bitmap_sample.getHeight(), CvType.CV_8UC1);
 			//			
-			//			Log.v(TAG, "begin transform");
-			//			Core.subtract(lbgr.get(0), new Scalar(mean_samp.val[0]), mB_sample);
-			//			Core.multiply(mB_sample, new Scalar(std_ref_s.val[0]/std_samp.val[0]), temp);
-			//			Core.add(temp, new Scalar(mean_ref_s.val[0]), mB_sample);
-			//
-			//			Core.subtract(lbgr.get(1), new Scalar(mean_samp.val[1]), mG_sample);
-			//			Core.multiply(mG_sample, new Scalar(std_ref_s.val[1]/std_samp.val[1]), temp);
-			//			Core.add(temp, new Scalar(mean_ref_s.val[1]), mG_sample);
-			//
-			//			Core.subtract(lbgr.get(2), new Scalar(mean_samp.val[2]), mR_sample);
-			//			Core.multiply(mR_sample, new Scalar(std_ref_s.val[2]/std_samp.val[2]), temp);
-			//			Core.add(temp, new Scalar(mean_ref_s.val[2]), mR_sample);
-			//			
-			//			Mat mB_sample_temp = new Mat(bitmap_sample.getWidth(), bitmap_sample.getHeight(), CvType.CV_8UC1);
-			//			Mat mG_sample_temp = new Mat(bitmap_sample.getWidth(), bitmap_sample.getHeight(), CvType.CV_8UC1);
-			//			Mat mR_sample_temp = new Mat(bitmap_sample.getWidth(), bitmap_sample.getHeight(), CvType.CV_8UC1);
-			//			Core.inRange(mB_sample,new Scalar(0), new Scalar(255), mB_sample_temp);
-			//			Core.inRange(mG_sample,new Scalar(0), new Scalar(255), mG_sample_temp);
-			//			Core.inRange(mR_sample,new Scalar(0), new Scalar(255), mR_sample_temp);
-			//			
-			//			Log.v(TAG, "begin merge");
-			//			List<Mat> lbgr_trans = new ArrayList<Mat>(4);
-			//			lbgr_trans.add(mB_sample_temp);
-			//			lbgr_trans.add(mG_sample_temp);
-			//			lbgr_trans.add(mR_sample_temp);
-			//			lbgr_trans.add(lbgr.get(3));
-			//
-			//			Mat sample_trans = new Mat();
-			//			Core.merge(lbgr_trans, sample_trans);
-			//			Utils.matToBitmap(sample_trans, bitmap_sample);
-			//			imgPreview.setImageBitmap(bitmap_sample);
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
-		
+
 		return -1;
 	}
+
+	public Mat normalizeImg(Mat sample, Mat ref){
+		Log.v(TAG, "bitmap to matrix");
+
+		//calculate mean and stddev for each color channel for both sample and ref
+		//stored in matrix mean and stddev
+
+		MatOfDouble mean_ref = new MatOfDouble(); 
+		MatOfDouble std_ref = new MatOfDouble();
+		Core.meanStdDev(ref, mean_ref, std_ref);
+		Log.v(TAG, "mean_ref" + mean_ref.toString());
+		Log.v(TAG, "std_ref" + std_ref.toString());
+
+
+		MatOfDouble mean_sample = new MatOfDouble();
+		MatOfDouble std_sample = new MatOfDouble();
+		Core.meanStdDev(sample, mean_sample, std_sample);
+		Log.v(TAG, "mean_sample" + mean_sample.toString());
+		Log.v(TAG, "std_sample" + std_sample.toString());
+
+		Scalar mean_ref_scalar = new Scalar(mean_ref.toArray());
+		Scalar std_ref_scalar = new Scalar(std_ref.toArray());
+		Scalar mean_samp_scalar = new Scalar (mean_sample.toArray());
+		Scalar std_samp_scalar = new Scalar(std_sample.toArray());
+
+		List<Mat> lbgr = new ArrayList <Mat>(4);
+		Core.split(sample,lbgr);
+		Mat mB_sample = new Mat (sample.height(),sample.width(), CvType.CV_8UC1);
+		Mat mG_sample = new Mat (sample.height(),sample.width(), CvType.CV_8UC1);
+		Mat mR_sample = new Mat (sample.height(),sample.width(), CvType.CV_8UC1);
+		Mat temp = new Mat (sample.height(),sample.width(), CvType.CV_8UC1);
+
+		Log.v(TAG, "begin transform");
+		Core.subtract(lbgr.get(0), new Scalar(mean_samp_scalar.val[0]), mB_sample);
+		Core.multiply(mB_sample, new Scalar(std_ref_scalar.val[0]/std_samp_scalar.val[0]), temp);
+		Core.add(temp, new Scalar(mean_ref_scalar.val[0]), mB_sample);
+
+		Core.subtract(lbgr.get(1), new Scalar(mean_samp_scalar.val[1]), mG_sample);
+		Core.multiply(mG_sample, new Scalar(std_ref_scalar.val[1]/std_samp_scalar.val[1]), temp);
+		Core.add(temp, new Scalar(mean_ref_scalar.val[1]), mG_sample);
+
+		Core.subtract(lbgr.get(2), new Scalar(mean_samp_scalar.val[2]), mR_sample);
+		Core.multiply(mR_sample, new Scalar(std_ref_scalar.val[2]/std_samp_scalar.val[2]), temp);
+		Core.add(temp, new Scalar(mean_ref_scalar.val[2]), mR_sample);
+
+		Mat mB_sample_temp = new Mat(sample.height(),sample.width(), CvType.CV_8UC1);
+		Mat mG_sample_temp = new Mat(sample.height(),sample.width(), CvType.CV_8UC1);
+		Mat mR_sample_temp = new Mat(sample.height(),sample.width(), CvType.CV_8UC1);
+		Core.inRange(mB_sample,new Scalar(0), new Scalar(255), mB_sample_temp);
+		Core.inRange(mG_sample,new Scalar(0), new Scalar(255), mG_sample_temp);
+		Core.inRange(mR_sample,new Scalar(0), new Scalar(255), mR_sample_temp);
+
+		Log.v(TAG, "begin merge");
+		List<Mat> lbgr_trans = new ArrayList<Mat>(4);
+		lbgr_trans.add(mB_sample_temp);
+		lbgr_trans.add(mG_sample_temp);
+		lbgr_trans.add(mR_sample_temp);
+		lbgr_trans.add(lbgr.get(3));
+
+		Mat sample_trans = new Mat();
+		Core.merge(lbgr_trans, sample_trans);
+		Bitmap samp_bitmap = Bitmap.createBitmap(sample.cols(), sample.rows(),Bitmap.Config.ARGB_8888);
+		Utils.matToBitmap(sample_trans, samp_bitmap);
+		imgPreview.setImageBitmap(samp_bitmap);
+
+
+		return sample_trans;
+	}
+
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
