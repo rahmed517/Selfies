@@ -1,10 +1,8 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/processMoleImg"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.border.ProcessMoleImg"
-    tools:ignore="MergeRootFrame" >
+    android:layout_height="match_parent" >
 
     <ImageView
         android:id="@+id/imgPreview"
@@ -17,10 +15,10 @@
          android:id="@+id/button_next"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:onClick="dispResults"
-         android:text="@string/button_next" 
-         android:layout_marginBottom = "20dp"
-         android:layout_marginRight = "26dp"
-         android:textSize = "30sp"/>
+         android:layout_alignBottom="@id/imgPreview"
+         android:layout_alignRight = "@id/imgPreview"
+         android:onClick="takePennyImg"
+         android:text="@string/button_next"
+         android:textSize="30sp" />
 
-</FrameLayout>
+</RelativeLayout>

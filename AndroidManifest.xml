@@ -45,13 +45,17 @@
                 android:value="com.example.selfies.CaptureMoleImg" />
         </activity>
         <activity
-            android:name="com.example.selfies.Results"
-            android:label="@string/title_activity_results" >
+            android:name="com.example.selfies.CapturePennyImg"
+            android:label="@string/title_activity_capture_penny_img"
+            android:parentActivityName="com.example.selfies.ProcessMoleImg" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.selfies.ProcessMoleImg" />
         </activity>
+        <activity
+            android:name="com.example.selfies.MeasureDiameter"
+            android:label="@string/title_activity_measure_diameter" >
+        </activity>
     </application>
 
 </manifest>
-

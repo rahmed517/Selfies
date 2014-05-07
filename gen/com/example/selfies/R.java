@@ -1119,16 +1119,18 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f050019;
         public static final int action_menu_presenter=0x7f05001a;
         public static final int action_mode_close_button=0x7f050027;
-        public static final int action_settings=0x7f050047;
+        public static final int action_settings=0x7f05004c;
         public static final int activity_chooser_view_content=0x7f050028;
         public static final int always=0x7f05000e;
         public static final int any=0x7f050000;
         public static final int back=0x7f050001;
-        public static final int backbutton=0x7f050045;
         public static final int beginning=0x7f050014;
         public static final int btnCapturePicture=0x7f050040;
+        public static final int button_finish=0x7f050048;
         public static final int button_next=0x7f050042;
         public static final int checkbox=0x7f050030;
+        public static final int circleDraw=0x7f050043;
+        public static final int circleView=0x7f050046;
         public static final int collapseActionView=0x7f050010;
         public static final int default_activity_button=0x7f05002b;
         public static final int dialog=0x7f050011;
@@ -1138,22 +1140,25 @@ containing a value of this type.
         public static final int end=0x7f050016;
         public static final int expand_activities_button=0x7f050029;
         public static final int expanded_menu=0x7f05002f;
+        public static final int frame=0x7f050044;
         public static final int front=0x7f050002;
         public static final int home=0x7f050017;
         public static final int homeAsUp=0x7f050008;
         public static final int icon=0x7f05002d;
         public static final int ifRoom=0x7f05000d;
         public static final int image=0x7f05002a;
-        public static final int imageView1=0x7f050046;
-        public static final int imgPreview=0x7f050044;
+        public static final int imgPreview=0x7f050045;
         public static final int instructions=0x7f05003f;
+        public static final int instructions_measure_mole=0x7f05004a;
+        public static final int instructions_measure_penny=0x7f050049;
+        public static final int lineView=0x7f050047;
         public static final int listMode=0x7f050004;
         public static final int list_item=0x7f05002c;
         public static final int middle=0x7f050015;
         public static final int never=0x7f05000c;
         public static final int none=0x7f050013;
         public static final int normal=0x7f050003;
-        public static final int processMoleImg=0x7f050043;
+        public static final int processMoleImg=0x7f05004b;
         public static final int progress_circular=0x7f05001b;
         public static final int progress_horizontal=0x7f05001c;
         public static final int radio=0x7f050032;
@@ -1232,18 +1237,22 @@ containing a value of this type.
         public static final int abc_search_view=0x7f030016;
         public static final int abc_simple_decor=0x7f030017;
         public static final int activity_capture_mole_img=0x7f030018;
-        public static final int activity_capture_safe_img=0x7f030019;
-        public static final int activity_home=0x7f03001a;
-        public static final int activity_process_mole_img=0x7f03001b;
-        public static final int activity_results=0x7f03001c;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001d;
+        public static final int activity_capture_penny_img=0x7f030019;
+        public static final int activity_capture_safe_img=0x7f03001a;
+        public static final int activity_home=0x7f03001b;
+        public static final int activity_measure_diameter=0x7f03001c;
+        public static final int activity_process_mole_img=0x7f03001d;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001e;
     }
     public static final class menu {
         public static final int capture_mole_img=0x7f0c0000;
-        public static final int capture_safe_img=0x7f0c0001;
-        public static final int home=0x7f0c0002;
-        public static final int process_mole_img=0x7f0c0003;
-        public static final int results=0x7f0c0004;
+        public static final int capture_penny_img=0x7f0c0001;
+        public static final int capture_safe_img=0x7f0c0002;
+        public static final int circle_draw=0x7f0c0003;
+        public static final int home=0x7f0c0004;
+        public static final int measure_mole=0x7f0c0005;
+        public static final int process_mole_img=0x7f0c0006;
+        public static final int results=0x7f0c0007;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -1286,16 +1295,20 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abc_shareactionprovider_share_with_application=0x7f0a000b;
-        public static final int action_settings=0x7f0a000f;
+        public static final int action_settings=0x7f0a0010;
         public static final int app_name=0x7f0a000d;
+        public static final int button_finish=0x7f0a000f;
         public static final int button_next=0x7f0a000e;
-        public static final int hello_world=0x7f0a0016;
-        public static final int instructions_mole_skin=0x7f0a0014;
-        public static final int instructions_safe_skin=0x7f0a0013;
-        public static final int title_activity_capture_mole_img=0x7f0a0011;
-        public static final int title_activity_capture_safe_img=0x7f0a0010;
-        public static final int title_activity_process_mole_img=0x7f0a0012;
-        public static final int title_activity_results=0x7f0a0015;
+        public static final int instructions_measure_mole=0x7f0a001a;
+        public static final int instructions_measure_penny=0x7f0a0019;
+        public static final int instructions_mole_skin=0x7f0a0017;
+        public static final int instructions_penny=0x7f0a0018;
+        public static final int instructions_safe_skin=0x7f0a0016;
+        public static final int title_activity_capture_mole_img=0x7f0a0012;
+        public static final int title_activity_capture_penny_img=0x7f0a0014;
+        public static final int title_activity_capture_safe_img=0x7f0a0011;
+        public static final int title_activity_measure_diameter=0x7f0a0015;
+        public static final int title_activity_process_mole_img=0x7f0a0013;
     }
     public static final class style {
         /** 

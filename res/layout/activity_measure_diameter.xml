@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/circleDraw"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MergeRootFrame" >
+
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ImageView
+            android:id="@+id/imgPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <com.example.selfies.CirclesDrawingView
+            android:id="@+id/circleView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.example.selfies.LineDrawingView
+            android:id="@+id/lineView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/button_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="beginMeasureMole"
+        android:text="@string/button_next"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/button_finish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="calcDiam"
+        android:text="@string/button_finish"
+        android:textSize="30sp"
+        android:visibility = "gone" />
+
+    <TextView
+        android:id="@+id/instructions_measure_penny"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/frame"
+        android:text="@string/instructions_measure_penny"
+        android:textColor="#990000"
+        android:textSize="22sp" />
+
+    <TextView
+        android:id="@+id/instructions_measure_mole"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/frame"
+        android:text="@string/instructions_measure_mole"
+        android:textColor="#990000"
+        android:textSize="22sp"
+        android:visibility="invisible" />
+
+</RelativeLayout>

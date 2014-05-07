@@ -55,7 +55,7 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 
 	private Bitmap bitmap_ref;
 	private Bitmap bitmap_sample;
-	public double [] scores = new double [3];
+	public double [] scores = new double [4];
 
 
 	@Override
@@ -185,15 +185,8 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 				}
 			}
 
-			//calc gradient along contour & normalize based on total area
-			double totArea = 0;
+			//calc gradient along contour & normalize based on 
 			double contourGradientSum = 0;
-			each = mContours.iterator();
-			while(each.hasNext()){
-				MatOfPoint contour = each.next();
-				totArea += Imgproc.contourArea(contour);
-			}
-
 			Iterator<Point> each_pt = border.iterator();
 			while(each_pt.hasNext()){
 				Point pt = each_pt.next();
@@ -202,7 +195,7 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 				contourGradientSum += Core.mean(gradVals.submat(y-1, y+1, x-1, x+1)).val[0];
 			}
 
-			double score = contourGradientSum/totArea;
+			double score = contourGradientSum/border.size();
 			Log.v(TAG, "score: " +score);
 			Log.v(TAG, "Contours count: " + mContours.size());
 			Log.v(TAG, "Border size: " + border.size());
@@ -299,9 +292,10 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 		return false; // don't need subsequent touch events
 	}
 
-	public void dispResults(View view){
-		Intent intent = new Intent(view.getContext(), Results.class);
+	public void takePennyImg(View view){
+		Intent intent = new Intent(view.getContext(), CapturePennyImg.class);
 		startActivity(intent);
+		//add intent extra for result
 	}
 
 }
