@@ -12,7 +12,8 @@ public class ColorBall {
     int radius;
 
     public ColorBall(Context context, Point point, int radius) {
-        this.id = ++count;
+        this.id = count;
+        count++;
       
         mContext = context;
         this.point = point;

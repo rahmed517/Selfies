@@ -55,7 +55,7 @@ public class CaptureMoleImg extends Activity {
 	public Uri fileUriSafe;
 	private Button btnCapturePicture;
 	private static final String TAG = "CaptureMoleImg";
-	
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

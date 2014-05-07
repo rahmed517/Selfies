@@ -22,7 +22,7 @@ public class LineDrawingView extends View {
 
 	private ArrayList<ColorBall> colorballs = new ArrayList<ColorBall>();
 	// array that holds the balls
-	private int balID = 0;
+	private int balID = -1;
 	// variable to know what ball is being dragged
 
 
@@ -93,19 +93,20 @@ public class LineDrawingView extends View {
 		mBallPaint.setStyle(Paint.Style.FILL);
 
 		point1 = new Point();
-		point1.x = 100;
+		point1.x = 25;
 		point1.y = 400;
 
 		point2 = new Point();
-		point2.x = 250;
+		point2.x = 150;
 		point2.y = 400;
 		
 		line = new Line(point1.x, point1.y, point2.x, point2.y);
 		
 		// declare each ball with the ColorBall class
 		ColorBall.count = 0; //reset count for BallID after creating CirclesDrawingView
-		colorballs.add(new ColorBall(ct, point1,(int) line.calcLength()/20 ));
-		colorballs.add(new ColorBall(ct, point2, (int) line.calcLength()/20));
+		int rad = (int) line.calcLength()/20;
+		colorballs.add(new ColorBall(ct, point1, Math.max(rad, 10)));
+		colorballs.add(new ColorBall(ct, point2, Math.max(rad, 10)));
 
 	}
 
@@ -153,7 +154,7 @@ public class LineDrawingView extends View {
 				}
 			}
 
-			if(balID > 0){
+			if(balID > -1){
 				break;
 			}
 			
@@ -177,9 +178,9 @@ public class LineDrawingView extends View {
 		case MotionEvent.ACTION_MOVE: // touch drag ball with same finger used to select
 			Log.v(TAG,"Moving Ball : " + balID);
 			if (balID > -1) {
-				int ball_index=balID-1;
-				colorballs.get(ball_index).setX(xTouch);
-				colorballs.get(ball_index).setY(yTouch);
+				//int ball_index=balID-1;
+				colorballs.get(balID).setX(xTouch);
+				colorballs.get(balID).setY(yTouch);
 				//dynamically reshape line
 				line = new Line(colorballs.get(0).getX(), colorballs.get(0).getY(), 
 						colorballs.get(1).getX(), colorballs.get(1).getY());			

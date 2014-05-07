@@ -34,13 +34,14 @@ public class CapturePennyImg extends ActionBarActivity {
 	private Button btnCapturePicture;
 	private static final String TAG = "CapturePennyImg";
 	public Uri fileUriPenny;
-	
+	public double [] scores;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 				Bundle b = getIntent().getExtras();
-				if(b!=null){//get intent for results
+				if(b!=null){
+					scores = (double[])b.get("scores");
 				}
 		
 		
@@ -92,6 +93,7 @@ public class CapturePennyImg extends ActionBarActivity {
 	public void beginCircleDraw(){
 		Intent intent = new Intent(this,MeasureDiameter.class);
 		intent.putExtra("penny_pic", fileUriPenny);
+		intent.putExtra("scores", scores);
 		startActivity(intent);
 	}
 	

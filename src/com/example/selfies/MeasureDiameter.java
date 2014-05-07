@@ -30,7 +30,7 @@ public class MeasureDiameter extends ActionBarActivity{
 	public Uri fileUriPenny;
 	private double scale;
 	private double length;
-	private double [] scores = new double [4];
+	private double [] scores;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +40,9 @@ public class MeasureDiameter extends ActionBarActivity{
 		if(b!=null){
 			fileUriPenny =(Uri) b.get("penny_pic");
 			Log.v(TAG, "penny: "+ fileUriPenny);
+			scores = (double []) b.get("scores");
+			Log.v(TAG, "border irreg: " + scores[0] + "assym: " + scores [1] 
+					   + "colors: " + scores [2]);
 		}
 
 		setContentView(R.layout.activity_measure_diameter);
@@ -109,7 +112,7 @@ public class MeasureDiameter extends ActionBarActivity{
 		scores[3] = diam;
 		Log.v(TAG, "scale: " + scale);
 		Log.v(TAG, "length: " + length);
-		Log.v(TAG, "diam: " + diam);
+		Log.v(TAG, "diam: " + scores[3]);
 
 	}
 

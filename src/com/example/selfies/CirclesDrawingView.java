@@ -22,11 +22,12 @@ public class CirclesDrawingView extends View {
 	public static double scale_mm2pix; 
 	private static final double penny_rad = 19.05/2; //mm 
 	
-	// point1 and point 3 are grouped and point 2 and point 4 are grouped
+	// point1 and point 3 (corresponding to BalID 0 & 2 respectively) are grouped with GroupID 1
+	// point 2 and point 4 (corresponding to BalID 1 & 3 respectively) are grouped with GroupID 2
 	int groupId = -1;
 	private ArrayList<ColorBall> colorballs = new ArrayList<ColorBall>();
 	// array that holds the balls
-	private int balID = 0;
+	private int balID = -1;
 	// variable to know what ball is being dragged
 
 
@@ -99,12 +100,15 @@ public class CirclesDrawingView extends View {
 		mBallPaint.setColor(Color.GRAY);
 		mBallPaint.setStrokeWidth(20);
 		mBallPaint.setStyle(Paint.Style.FILL);
-
+		
+//
 //		int viewWidth = this.getWidth();
 //		int viewHeight = this.getHeight();
-//		circle = new CircleArea(viewWidth/2,viewHeight/2,200);
+//		Log.v(TAG, "width: " + viewWidth);
+//		Log.v(TAG, "height: " + viewHeight);
+//		circle = new CircleArea(viewWidth/2,viewHeight/2,viewHeight/2);
 		
-		circle = new CircleArea(250,350,50);
+		circle = new CircleArea(80,80,50);
 		
 		point1 = new Point();
 		point1.x = circle.centerX-circle.radius;
@@ -122,7 +126,8 @@ public class CirclesDrawingView extends View {
 		point4.x = circle.centerX-circle.radius;
 		point4.y = circle.centerY+circle.radius;
 
-		// declare each ball with the ColorBall class
+		// declare each ball with the ColorBall class, balID assigned automatically by ColorBall class 
+		// depending on order ball added to colorball array
 		colorballs.add(new ColorBall(ct, point1, 10));
 		colorballs.add(new ColorBall(ct, point2, 10));
 		colorballs.add(new ColorBall(ct, point3, 10));
@@ -179,9 +184,9 @@ public class CirclesDrawingView extends View {
 					balID = ball.getID();
 					Log.v(TAG,"Ball selected: " + balID);
 					if (balID == 1 || balID == 3) {
-						groupId = 1;
-					} else {
 						groupId = 2;
+					} else if(balID == 0 || balID == 2) {
+						groupId = 1;
 					}
 					invalidate();
 					break;
@@ -211,9 +216,9 @@ public class CirclesDrawingView extends View {
 		case MotionEvent.ACTION_MOVE: // touch drag ball with same finger used to select
 			Log.v(TAG,"Moving Ball : " + balID);
 			if (balID > -1) {
-				int ball_index=balID-1;
-				colorballs.get(ball_index).setX(xTouch);
-				colorballs.get(ball_index).setY(yTouch);
+//				int ball_index=balID-1;
+				colorballs.get(balID).setX(xTouch);
+				colorballs.get(balID).setY(yTouch);
 				
 
 				//dynamically change other balls positions to reshape square

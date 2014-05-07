@@ -294,6 +294,7 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 
 	public void takePennyImg(View view){
 		Intent intent = new Intent(view.getContext(), CapturePennyImg.class);
+		intent.putExtra("scores", scores);
 		startActivity(intent);
 		//add intent extra for result
 	}
