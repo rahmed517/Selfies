@@ -15,5 +15,5 @@
     <string name="instructions_penny">Take a picture of the mole with a penny in the frame.</string>
     <string name="instructions_measure_penny">Tap to center the blue circle on the penny. Adjust size at corners.</string>
     <string name="instructions_measure_mole">Tap to move line to desired starting point. Adjust size at ends.</string>
-
+    <string name="title_activity_display_results">Results</string>
 </resources>

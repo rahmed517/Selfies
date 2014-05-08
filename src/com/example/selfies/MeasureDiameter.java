@@ -3,6 +3,7 @@ package com.example.selfies;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,7 +20,7 @@ import android.widget.TextView;
 import android.os.Build;
 
 public class MeasureDiameter extends ActionBarActivity{
-	private static final String TAG = "CircleDraw";
+	private static final String TAG = "MeasureMole";
 	private ImageView imgPreview;
 	private LineDrawingView lineView;
 	private CirclesDrawingView circleView;
@@ -41,7 +42,7 @@ public class MeasureDiameter extends ActionBarActivity{
 			fileUriPenny =(Uri) b.get("penny_pic");
 			Log.v(TAG, "penny: "+ fileUriPenny);
 			scores = (double []) b.get("scores");
-			Log.v(TAG, "border irreg: " + scores[0] + "assym: " + scores [1] 
+			Log.v(TAG, "asymm: " + scores[0] + "border irreg: " + scores [1] 
 					   + "colors: " + scores [2]);
 		}
 
@@ -113,7 +114,10 @@ public class MeasureDiameter extends ActionBarActivity{
 		Log.v(TAG, "scale: " + scale);
 		Log.v(TAG, "length: " + length);
 		Log.v(TAG, "diam: " + scores[3]);
-
+		
+		Intent intent = new Intent(view.getContext(), DisplayResults.class);
+		intent.putExtra("scores", scores);
+		startActivity(intent);
 	}
 
 

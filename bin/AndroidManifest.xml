@@ -55,6 +55,16 @@
         <activity
             android:name="com.example.selfies.MeasureDiameter"
             android:label="@string/title_activity_measure_diameter" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.selfies.CapturePennyImg" />
+        </activity>
+        <activity
+            android:name="com.example.selfies.DisplayResults"
+            android:label="@string/title_activity_display_results" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.selfies.MeasureDiameter" />
         </activity>
     </application>
 

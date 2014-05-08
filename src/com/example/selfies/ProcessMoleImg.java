@@ -51,11 +51,13 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 	private static double mMinContourArea = .1;
 	private List<MatOfPoint> mContours = new ArrayList<MatOfPoint>();
 	private Scalar CONTOUR_COLOR = new Scalar(255,0,0, 255);
+	private Scalar COLOR_WHITE = new Scalar(255,255,255);
 	public List<Point>border = new ArrayList<Point>();
 
 	private Bitmap bitmap_ref;
 	private Bitmap bitmap_sample;
 	public double [] scores = new double [4];
+	public Mat borders = new Mat();
 
 
 	@Override
@@ -76,8 +78,8 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 		imgPreview.setFocusable(true);
 		imgPreview.setOnTouchListener(ProcessMoleImg.this);
 
-		scores[0] = processImg();
-
+		scores[1] = processImg();
+		scores[0] = analyze_asymmetry(borders);
 	}
 
 	@Override
@@ -126,6 +128,7 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 			//convert from bitmap to Mat
 			Mat ref = new Mat(bitmap_ref.getHeight(), bitmap_ref.getWidth(), CvType.CV_8UC4);
 			Mat sample = new Mat(bitmap_sample.getHeight(), bitmap_sample.getWidth(), CvType.CV_8UC4);
+			Mat mask = new Mat(bitmap_sample.getHeight(),bitmap_sample.getWidth(),CvType.CV_8UC4);
 			Mat sample2calcgrad = new Mat(bitmap_sample.getHeight(), bitmap_sample.getWidth(), CvType.CV_8UC4);
 
 			Utils.bitmapToMat(bitmap_ref, ref);
@@ -227,6 +230,8 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 			Log.v(TAG, "Contours count: " + mContours.size());
 			Log.v(TAG, "Border size: " + border.size());
 			Imgproc.drawContours(sample, mContours, -1, CONTOUR_COLOR);
+			Imgproc.drawContours(mask, mContours, -1, COLOR_WHITE, -1);
+			borders = mask;
 
 			//display image with contours
 			Utils.matToBitmap(sample, bitmap_sample);
@@ -326,8 +331,39 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 		//add intent extra for result
 	}
 
+private double analyze_asymmetry(Mat mat) {
+    
+    int rows = mat.height();
+    int cols = mat.width();
+    
+    Mat gray = new Mat(rows,cols,CvType.CV_32FC1);
+    Imgproc.cvtColor(mat, gray, Imgproc.COLOR_RGB2GRAY);
+    
+    double values[] = {0,0}; 
+    
+    for (int i = 0; i < 2; i++) {
+    	Mat flip = new Mat(rows,cols,CvType.CV_8UC1);
+        Core.flip(gray,flip,i);
+        
+        Mat binarygray = new Mat(rows,cols,CvType.CV_8UC1);
+        Mat binaryflip = new Mat(rows,cols,CvType.CV_8UC1);
+        Mat difference = new Mat(rows,cols,CvType.CV_8UC1);
+        
+        Imgproc.threshold(gray, binarygray, 70, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(flip,binaryflip,70,255,Imgproc.THRESH_BINARY);
+        Core.subtract(binarygray, binaryflip, difference);
+        Scalar sum = Core.mean(difference);
+        
+        values[i] = sum.val[0];
+    }
+    
+    double average = (values[0]+values[1])/2 ;
+    
+    //normalize based on training images with known labels 
+    average = (average-1.3)/(3.4-1.3)*2;
+    
+	return average;
+            
 }
 
-
-
-
+}
