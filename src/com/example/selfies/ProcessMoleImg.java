@@ -185,17 +185,44 @@ public class ProcessMoleImg extends Activity implements OnTouchListener{
 				}
 			}
 
-			//calc gradient along contour & normalize based on 
-			double contourGradientSum = 0;
-			Iterator<Point> each_pt = border.iterator();
-			while(each_pt.hasNext()){
-				Point pt = each_pt.next();
-				int x = (int) pt.x;
-				int y = (int) pt.y;			
-				contourGradientSum += Core.mean(gradVals.submat(y-1, y+1, x-1, x+1)).val[0];
+			//segment border into 8 parts 
+			//calc gradient along contour segment & normalize based on number of points in border
+			//upto 7 points at end of border list ignored
+			double [] seg_val = new double [8];
+			int seg_len = border.size()/8;
+			for(int i = 0; i<8; i++){
+				double contourGradientSum = 0;
+				for(int j=i*seg_len; j<(i+1)*seg_len;j++){
+					Point pt = border.get(j);
+					int x = (int) pt.x;
+					int y = (int) pt.y;			
+					contourGradientSum += Core.mean(gradVals.submat(y-1, y+1, x-1, x+1)).val[0];
+				}
+				seg_val[i]=contourGradientSum/seg_len;
 			}
 
-			double score = contourGradientSum/border.size();
+
+			Log.v(TAG, "grad vals: [" + seg_val[0] + "," + seg_val[1] + "," 
+					+ seg_val[2] + ","+ seg_val[3] + ","
+					+ seg_val[4] + ","+ seg_val[5] + ","
+					+ seg_val[6] + ","+ seg_val[7] + "]");
+			
+			double thresh = 140;
+			double score = 0;
+
+			for(double val:seg_val){
+				if (val<=thresh){
+					score++;
+				}
+			}
+			
+			if(score<8){
+				score += mContours.size()/7;
+				score = Math.min(8,score);
+			}
+
+
+
 			Log.v(TAG, "score: " +score);
 			Log.v(TAG, "Contours count: " + mContours.size());
 			Log.v(TAG, "Border size: " + border.size());
